@@ -15,13 +15,15 @@ function mapCatalogModels() {
 }
 function byokModelEntry(provider, model) {
   const id = `${provider.id}/${model.id}`;
-  const label = model.name ?? model.id;
+  const name = model.name ?? model.id;
+  const providerName = provider.name ?? provider.id;
+  const label = `${name} — ${providerName}`;
   const efforts = Array.isArray(model.reasoningEfforts) && model.reasoningEfforts.length > 0 ? [...model.reasoningEfforts] : void 0;
   return {
     id,
     label,
-    description: `${label} — ${provider.name ?? provider.id} (custom)`,
-    category: `${provider.name ?? provider.id} (byok)`,
+    description: `${label} (custom)`,
+    category: `${providerName} (byok)`,
     reasoningEfforts: efforts,
     outputTokenLimit: typeof model.maxOutput === "number" ? model.maxOutput : DEFAULT_DESKTOP_MAX_OUTPUT_TOKENS,
     vision: inferVision(id, provider.id),

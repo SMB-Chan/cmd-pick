@@ -9,6 +9,8 @@ Command Code Desktop (v0.1.30) のモデルピッカーに、CLI と同じ BYOK 
 - `fetchModels()` が `~/.commandcode/providers.json` を読む
 - 可能なら `@commandcode/harness` の `loadProvidersConfig` を使い、失敗時はディスク直読み
 - ピッカーに `xAI (byok)` / `Meta (byok)` / `Xiaomi MiMo (SGP Token Plan) (byok)` などの見出しで出る
+- ラベルはモデル名とプロバイダ名を併記（例: `Grok 4.6 — xAI (SuperGrok)`）
+- プロバイダ id が違えば同じモデルでも両方出る（例: `xiaomi/mimo-v2.5-pro` と `xiaomi-token-plan-sgp/mimo-v2.5-pro`）
 - モデル id は CLI と同じ `provider/model`（例: `xai/grok-4.6`）
 
 ## 適用

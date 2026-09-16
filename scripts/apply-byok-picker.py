@@ -45,6 +45,35 @@ def resign() -> None:
     )
 
 
+def closing_brace(source: str, open_brace: int) -> int:
+    depth = 0
+    for i in range(open_brace, len(source)):
+        if source[i] == "{":
+            depth += 1
+        elif source[i] == "}":
+            depth -= 1
+            if depth == 0:
+                return i
+    return -1
+
+
+def replace_existing_patch(source: str, replacement: str) -> str | None:
+    start = source.find("function mapCatalogModels() {")
+    if start < 0:
+        return None
+    fetch = source.find("async function fetchModels() {", start)
+    if fetch < 0:
+        return None
+    brace = source.find("{", fetch)
+    end = closing_brace(source, brace)
+    if end < 0:
+        return None
+    end += 1
+    if source[end:end + 1] == "\n":
+        end += 1
+    return source[:start] + replacement + source[end:]
+
+
 def apply() -> int:
     if not TARGET.exists():
         print(f"missing {TARGET}", file=sys.stderr)
@@ -52,7 +81,16 @@ def apply() -> int:
     source = TARGET.read_text()
     replacement = PATCH.read_text().rstrip() + "\n"
     if "function loadByokProvidersFromDisk()" in source:
-        print("already patched")
+        updated = replace_existing_patch(source, replacement)
+        if updated is None:
+            print("already patched but block not found — app version mismatch?", file=sys.stderr)
+            return 1
+        if updated == source:
+            print("already patched")
+            return 0
+        TARGET.write_text(updated)
+        resign()
+        print(f"updated {TARGET}")
         return 0
     if OLD not in source:
         print("fetchModels() not found in expected form — app version mismatch?", file=sys.stderr)
